@@ -10,7 +10,7 @@ def sigmoid_derivative(x):
 
 
 # Generate synthetic regression data
-np.random.seed(0)
+np.random.seed(42)
 X = np.linspace(0, 10, 50).reshape(-1, 1)  # 50 data points
 y = 2.5 * X + np.random.randn(50, 1) * 2  # Linear relation with noise
 
@@ -19,21 +19,21 @@ y_min, y_max = y.min(), y.max()
 y = (y - y_min) / (y_max - y_min)
 
 # Initialize weights and bias
-w_hidden = np.random.rand(1, 3)  # 1 input neuron -> 3 hidden neurons
+w_hidden = np.random.rand(1, 3)
 b_hidden = np.random.rand(1, 3)
-w_output = np.random.rand(3, 1)  # 3 hidden neurons -> 1 output neuron
+w_output = np.random.rand(3, 1)
 b_output = np.random.rand(1, 1)
 
 learning_rate = 0.01
-epochs = 100000  # Number of epochs
-mini_loop = 5  # Number of mini-batch iterations per epoch
-batch_size = 30  # Number of samples per mini-batch
+epochs = 100
+mini_loop = 5
+batch_size = 30
 loss_history = []
 
 for epoch in range(epochs):
     total_loss = 0
-    for _ in range(mini_loop):  # Process 30 random samples in each mini-loop iteration
-        indices = np.random.choice(len(X), batch_size, replace=True)  # Random selection
+    for _ in range(mini_loop):
+        indices = np.random.choice(len(X), batch_size, replace=True)
         X_batch = X[indices]
         y_batch = y[indices]
 
@@ -41,14 +41,14 @@ for epoch in range(epochs):
         hidden_input = np.dot(X_batch, w_hidden) + b_hidden
         hidden_output = sigmoid(hidden_input)
         final_input = np.dot(hidden_output, w_output) + b_output
-        final_output = sigmoid(final_input)  # Using sigmoid activation in output layer
+        final_output = sigmoid(final_input)
 
         # Compute error
         error = y_batch - final_output
         loss = np.mean(np.abs(error))
         total_loss += loss
 
-        # Backpropagation (Mini-Batch Gradient Descent)
+        # Backpropagation
         output_gradient = error * sigmoid_derivative(final_output)
         w_output += learning_rate * np.dot(hidden_output.T, output_gradient) / batch_size
         b_output += learning_rate * np.mean(output_gradient, axis=0)

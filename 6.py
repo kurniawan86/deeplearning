@@ -13,56 +13,51 @@ def sigmoid_derivative(x):
 # Generate synthetic regression data
 np.random.seed(0)
 X = np.linspace(0, 10, 50).reshape(-1, 1)  # 50 data points
-y = 2.5 * X + np.random.randn(50, 1) * 2  # Linear relation with noise
+y = 2.5 * X + np.random.randn(50, 1) * 2
 
 # Initialize weights and bias
-w_hidden = np.random.rand(1, 3)  # 1 input neuron -> 3 hidden neurons
+w_hidden = np.random.rand(1, 3)
 b_hidden = np.random.rand(1, 3)
-w_output = np.random.rand(3, 1)  # 3 hidden neurons -> 1 output neuron
+w_output = np.random.rand(3, 1)
 b_output = np.random.rand(1, 1)
 
 learning_rate = 0.1
-epochs = 1000  # Number of epochs
-batch_size = 30  # Number of samples per batch
+epochs = 1000
 loss_history = []
 
 for epoch in range(epochs):
     total_loss = 0
-    indices = np.random.permutation(len(X))  # Shuffle data
-    X_shuffled = X[indices]
-    y_shuffled = y[indices]
-
-    for i in range(0, len(X), batch_size):
-        X_batch = X_shuffled[i:i + batch_size]
-        y_batch = y_shuffled[i:i + batch_size]
+    for i in range(len(X)):
+        x_sample = X[i].reshape(1, -1)
+        y_sample = y[i].reshape(1, -1)
 
         # Forward Pass
-        hidden_input = np.dot(X_batch, w_hidden) + b_hidden
+        hidden_input = np.dot(x_sample, w_hidden) + b_hidden
         hidden_output = sigmoid(hidden_input)
         final_input = np.dot(hidden_output, w_output) + b_output
-        final_output = final_input  # Using linear activation for regression
+        final_output = final_input
 
         # Compute error
-        error = y_batch - final_output
+        error = y_sample - final_output
         loss = np.abs(error).mean()
         total_loss += loss
 
-        # Backpropagation (Mini-Batch Gradient Descent)
-        output_gradient = error  # Derivative of linear activation is 1
-        w_output += learning_rate * np.dot(hidden_output.T, output_gradient) / batch_size
-        b_output += learning_rate * np.mean(output_gradient, axis=0)
+        # Backpropagation
+        output_gradient = error
+        w_output += learning_rate * np.dot(hidden_output.T, output_gradient)
+        b_output += learning_rate * output_gradient
 
         hidden_error = np.dot(output_gradient, w_output.T)
         hidden_gradient = hidden_error * sigmoid_derivative(hidden_output)
-        w_hidden += learning_rate * np.dot(X_batch.T, hidden_gradient) / batch_size
-        b_hidden += learning_rate * np.mean(hidden_gradient, axis=0)
+        w_hidden += learning_rate * np.dot(x_sample.T, hidden_gradient)
+        b_hidden += learning_rate * hidden_gradient
 
     # Store loss history
-    loss_history.append(total_loss / (len(X) / batch_size))
+    loss_history.append(total_loss / len(X))
 
     # Print loss every 100 epochs
     if epoch % 100 == 0:
-        print(f"Epoch {epoch}, Loss: {total_loss / (len(X) / batch_size)}")
+        print(f"Epoch {epoch}, Loss: {total_loss / len(X)}")
 
 # Plot actual vs predicted values
 plt.figure(figsize=(12, 5))
@@ -72,7 +67,7 @@ predicted_y = np.dot(sigmoid(np.dot(X, w_hidden) + b_hidden), w_output) + b_outp
 plt.plot(X, predicted_y, label="Predicted Data", color="red")
 plt.xlabel("Input X")
 plt.ylabel("Output y")
-plt.title("Regression Prediction using Neural Network with Mini-Batch Gradient Descent")
+plt.title("Regression Prediction using Neural Network with SGD")
 plt.legend()
 
 # Plot loss history
@@ -80,7 +75,7 @@ plt.subplot(1, 2, 2)
 plt.plot(range(epochs), loss_history, color="green")
 plt.xlabel("Epoch")
 plt.ylabel("Loss")
-plt.title("Loss over Epochs using Mini-Batch Gradient Descent")
+plt.title("Loss over Epochs using SGD")
 plt.grid()
 
 plt.show()

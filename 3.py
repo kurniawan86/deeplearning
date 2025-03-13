@@ -12,19 +12,19 @@ def sigmoid_derivative(x):
 
 # Generate synthetic regression data
 np.random.seed(0)
-X = np.linspace(0, 10, 50).reshape(-1, 1)  # 50 data points
-y = 2.5 * X + np.random.randn(50, 1) * 2  # Linear relation with noise
+X = np.linspace(0, 10, 50).reshape(-1, 1)
+y = 2.5 * X + np.random.randn(50, 1) * 2
 
 # Initialize weights and bias
-w_hidden = np.random.rand(1, 3)  # 1 input neuron -> 3 hidden neurons
+w_hidden = np.random.rand(1, 3)
 b_hidden = np.random.rand(1, 3)
-w_output = np.random.rand(3, 1)  # 3 hidden neurons -> 1 output neuron
+w_output = np.random.rand(3, 1)
 b_output = np.random.rand(1, 1)
 
 learning_rate = 0.1
-epochs = 1000  # Number of epochs
-mini_loop = 5  # Number of mini-batch iterations per epoch
-batch_size = 30  # Number of samples per mini-batch
+epochs = 1000
+mini_loop = 5
+batch_size = 30
 loss_history = []
 
 for epoch in range(epochs):
@@ -45,8 +45,8 @@ for epoch in range(epochs):
         loss = np.abs(error).mean()
         total_loss += loss
 
-        # Backpropagation (Mini-Batch Gradient Descent)
-        output_gradient = error  # Derivative of linear activation is 1
+        # Backpropagation
+        output_gradient = error
         w_output += learning_rate * np.dot(hidden_output.T, output_gradient) / batch_size
         b_output += learning_rate * np.mean(output_gradient, axis=0)
 
@@ -63,8 +63,6 @@ for epoch in range(epochs):
         print(f"Epoch {epoch}, Loss: {total_loss / mini_loop}")
 
 # Testing phase
-# X_test = np.linspace(0, 10, 20).reshape(-1, 1)  # 20 testing points
-# actual_y_test = 2.5 * X_test + np.random.randn(20, 1) * 2  # Ground truth for testing
 X_test = X
 actual_y_test = y
 predicted_y_test = np.dot(sigmoid(np.dot(X_test, w_hidden) + b_hidden), w_output) + b_output
